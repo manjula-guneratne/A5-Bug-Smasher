@@ -1,8 +1,8 @@
 //Create the canvas
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
-canvas.width = 512;
-canvas.height = 400;
+canvas.width = 1250;
+canvas.height = 833;
 document.body.appendChild(canvas);
 
 //Background image
@@ -19,7 +19,7 @@ var bugImage = new Image();
 bugImage.onload = function(){
     bugReady = true;
 };
-bugImage.src = "dragon_fly.jpg";
+bugImage.src = "dragon_fly.png";
 
 //Game Objects
 var bug = {
@@ -31,8 +31,10 @@ var bugsSmashed = 0;
 
 //When the bug is clicked throws it somewhere on the screen randomly
 var reset = function(){
-    bug.x = 32 + (Math.random()*(canvas.width - 64));
-    bug.y = 32 + (Math.random()*(canvas.height - 64));
+    bug.x =  (Math.random()*(canvas.width - 250));
+    bug.y =  (Math.random()*(canvas.height - 250));
+    console.log("The bug width: "+bug.x);
+    console.log("The bug height: "+bug.y);
 };
 
 bgImage.addEventListener("click", smashed);
@@ -49,11 +51,11 @@ var render = function(){
         ctx.drawImage(bgImage,0,0);
     }
     if(bugReady){
-        ctx.drawImage(bugImage,bug,x,bug.y);
+        ctx.drawImage(bugImage,bug.x,bug.y);
     }
 
     //Score
-    ctx.fillStyle = "rgb(250,250,250)";
+    ctx.fillStyle = "rgb(250, 250, 250)";
     ctx.font = "24px Helvetica";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
@@ -65,7 +67,7 @@ var main = function(){
     var now = Date.now();
     var delta = now - then;
 
-    update(delta / 1000);
+    // update(delta / 1000);
     render();
 
     then = now;
