@@ -20,3 +20,66 @@ bugImage.onload = function(){
     bugReady = true;
 };
 bugImage.src = "dragon_fly.jpg";
+
+//Game Objects
+var bug = {
+    x:0,
+    y:0
+};
+
+var bugsSmashed = 0;
+
+//When the bug is clicked throws it somewhere on the screen randomly
+var reset = function(){
+    bug.x = 32 + (Math.random()*(canvas.width - 64));
+    bug.y = 32 + (Math.random()*(canvas.height - 64));
+};
+
+bgImage.addEventListener("click", smashed);
+
+function smashed(){
+    alert("Bug is Smashed!");
+    ++bugsSmashed;
+    reset();
+};
+
+//Draw everything
+var render = function(){
+    if(bgReady){
+        ctx.drawImage(bgImage,0,0);
+    }
+    if(bugReady){
+        ctx.drawImage(bugImage,bug,x,bug.y);
+    }
+
+    //Score
+    ctx.fillStyle = "rgb(250,250,250)";
+    ctx.font = "24px Helvetica";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText("Bugs caught: " + bugsSmashed ,32 ,32); 
+};
+
+// The main game loop
+var main = function(){
+    var now = Date.now();
+    var delta = now - then;
+
+    update(delta / 1000);
+    render();
+
+    then = now;
+
+    // Request to do this again ASAP
+    requestAnimationFrame(main);
+};
+
+// Cross-browser support for requestAnimationFrame
+var w = window;
+requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
+
+
+// Let's play this game!
+var then = Date.now();
+reset();
+main();
