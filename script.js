@@ -5,6 +5,11 @@ canvas.width = 1250;
 canvas.height = 833;
 document.body.appendChild(canvas);
 
+//Trying to add a new Button
+// var reset = document.createElement("button");
+// reset.appendChild(document.createTextNode("RESET"));
+// document.body.appendChild(reset);
+
 //Background image
 var bgReady = false;
 var bgImage = new Image();
@@ -16,6 +21,7 @@ bgImage.src = "sky.jpg"
 //Bug image
 var bugReady = false;
 var bugImage = new Image();
+var speed = 3000;
 bugImage.onload = function(){
     bugReady = true;
 };
@@ -30,19 +36,44 @@ var bug = {
 var bugsSmashed = 0;
 
 //When the bug is clicked throws it somewhere on the screen randomly
-var reset = function(){
-    bug.x =  (Math.random()*(canvas.width - 250));
-    bug.y =  (Math.random()*(canvas.height - 250));
-    console.log("The bug width: "+bug.x);
-    console.log("The bug height: "+bug.y);
+var move = function(value){
+
+    setInterval(myTimer,value);
+
+    function myTimer(){
+        bug.x =  (Math.random()*(canvas.width - 250));
+        bug.y =  (Math.random()*(canvas.height - 250));
+    }
 };
 
-bgImage.addEventListener("click", smashed);
+canvas.addEventListener("click", function (e){
+    //check
+    if(!bugReady){
+        return;
+    }
+
+    //Get the position relative to canvas
+    var rec = canvas.getBoundingClientRect();
+    var mouseX = e.clientX - rec.left;
+    var mouseY = e.clientY - rec.top;
+
+    //Check if the mouse clicked inside the bug image
+    if(
+        mouseX >= bug.x && mouseX <= bug.x + bugImage.width &&
+        mouseY >= bug.y && mouseY <= bug.y + bugImage.height
+    ){
+        smashed();
+    }
+})
 
 function smashed(){
-    alert("Bug is Smashed!");
+
     ++bugsSmashed;
-    reset();
+
+    //Reducing the movement time
+    speed -= 250;
+
+    move(speed);
 };
 
 //Draw everything
@@ -83,5 +114,5 @@ requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame
 
 // Let's play this game!
 var then = Date.now();
-reset();
+move(speed);
 main();
