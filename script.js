@@ -5,10 +5,6 @@ canvas.width = 1250;
 canvas.height = 833;
 document.body.appendChild(canvas);
 
-//Trying to add a new Button
-// var reset = document.createElement("button");
-// reset.appendChild(document.createTextNode("RESET"));
-// document.body.appendChild(reset);
 
 //Background image
 var bgReady = false;
@@ -21,11 +17,28 @@ bgImage.src = "sky.jpg"
 //Bug image
 var bugReady = false;
 var bugImage = new Image();
-var speed = 3000;
+var speed = 2000;   //Initial speed
 bugImage.onload = function(){
     bugReady = true;
 };
 bugImage.src = "dragon_fly.png";
+
+//Reset Score image
+var resetScoreReady = false;
+var resetScoreImg = new Image();
+resetScoreImg.onload = function(){
+    resetScoreReady = true;
+}
+resetScoreImg.src = "btn_reset_score.png";
+
+//Reset Speed image
+var resetSpeedReady = false;
+var resetSpeedImg = new Image();
+resetSpeedImg.onload = function(){
+    resetSpeedReady = true;
+}
+resetSpeedImg.src = "btn_reset_speed.png";
+
 
 //Game Objects
 var bug = {
@@ -33,18 +46,40 @@ var bug = {
     y:0
 };
 
+var resetScore = {
+    x: (canvas.width -222),
+    y: 32
+}
+
+var resetSpeed = {
+    x: (canvas.width -(222*2)),
+    y: 32
+}
+
 var bugsSmashed = 0;
+var moveInterval = null;
 
 //When the bug is clicked throws it somewhere on the screen randomly
-var move = function(value){
+var move = function(speed){
 
-    setInterval(myTimer,value);
+    //Clear the existing timer
+    if(moveInterval !== null){
+        clearInterval(moveInterval);
+    }
+
+    moveInterval = setInterval(myTimer,speed);
 
     function myTimer(){
-        bug.x =  (Math.random()*(canvas.width - 250));
-        bug.y =  (Math.random()*(canvas.height - 250));
+        nextPositionCal();
+
+        console.log("Current speed is " + speed);
     }
 };
+
+function nextPositionCal(){
+    bug.x =  (Math.random()*(canvas.width - 250));
+    bug.y =  (Math.random()*(canvas.height - 250));
+}
 
 canvas.addEventListener("click", function (e){
     //check
@@ -64,11 +99,36 @@ canvas.addEventListener("click", function (e){
     ){
         smashed();
     }
+
+    //Check if the mouse clicked inside the Reset Score image
+    if(
+        mouseX >= resetScore.x && mouseX <= resetScore.x + resetScoreImg.width &&
+        mouseY >= resetScore.y && mouseY <= resetScore.y + resetScoreImg.height
+    ){
+        move(2000);   //Resets to original speed
+        bugsSmashed = 0;
+        speed = 2000;
+    }
+
+    //Check if the mouse clicked inside the Reset Speed image
+    if(
+        mouseX >= resetSpeed.x && mouseX <= resetSpeed.x + resetSpeedImg.width &&
+        mouseY >= resetSpeed.y && mouseY <= resetSpeed.y + resetSpeedImg.height
+    ){
+
+        move(2000);   //Resets to original speed
+        speed = 2000;
+    }
+
+
 })
 
 function smashed(){
 
     ++bugsSmashed;
+
+    //Once smashed immediately moves
+    nextPositionCal();
 
     //Reducing the movement time
     speed -= 250;
@@ -84,9 +144,15 @@ var render = function(){
     if(bugReady){
         ctx.drawImage(bugImage,bug.x,bug.y);
     }
+    if(resetScoreReady){
+        ctx.drawImage(resetScoreImg,resetScore.x,resetScore.y);
+    }
+    if(resetSpeedReady){
+        ctx.drawImage(resetSpeedImg,resetSpeed.x,resetSpeed.y);
+    }
 
     //Score
-    ctx.fillStyle = "rgb(250, 250, 250)";
+    ctx.fillStyle = "rgb(66, 135, 245)";
     ctx.font = "24px Helvetica";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
@@ -95,13 +161,8 @@ var render = function(){
 
 // The main game loop
 var main = function(){
-    var now = Date.now();
-    var delta = now - then;
 
-    // update(delta / 1000);
     render();
-
-    then = now;
 
     // Request to do this again ASAP
     requestAnimationFrame(main);
@@ -113,6 +174,5 @@ requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame
 
 
 // Let's play this game!
-var then = Date.now();
 move(speed);
 main();
